@@ -62,10 +62,7 @@ require_once('utils/utility.php');
                         </div>
                         <div class="panel-body"></div>
                         <table class="table table-bordered table-hover">
-                            <
-                            
-                            
-                            ead>
+                            <thead>
                                 <tr style="font-weight: 500;text-align: center;">
                                     <td width="50px">STT</td>
                                     <td>Ảnh</td>

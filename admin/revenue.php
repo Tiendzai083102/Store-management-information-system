@@ -120,76 +120,201 @@ foreach ($totalAmounts as $key => $total) {
 }
 
 ?>
+<?php
+$current_page = basename($_SERVER['PHP_SELF']);
+$current_dir = basename(dirname($_SERVER['PHP_SELF']));
+?>
 <!DOCTYPE HTML>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="newstyle.css">
-    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <!-- Popper JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.min.js"></script>
-    
-    <!-- <script type="text/javascript">
-        google.charts.load('current', {'packages':['corechart']});
-        google.charts.setOnLoadCallback(drawChart);
-
-        function drawChart() {
-            var traSua = <?php echo $percentages['tra_sua']; ?>;
-            var coffe = <?php echo $percentages['coffe']; ?>;
-            var sinhTo = <?php echo $percentages['sinh_to']; ?>;
-            var doAnVat = <?php echo $percentages['do_an_vat']; ?>;
-
-            var dataPie = google.visualization.arrayToDataTable([
-                ['Mặt hàng', 'Phần trăm'],
-                ['Trà Sữa', traSua],
-                ['Coffe', coffe],
-                ['Sinh Tố', sinhTo],
-                ['Đồ Ăn Vặt', doAnVat]
-            ]);
-
-            var dataColumn = google.visualization.arrayToDataTable([
-                ['Mặt hàng', 'Tổng tiền'],
-                <?php foreach ($totalAmounts as $key => $total): ?>
-                    ['<?php echo ucfirst(str_replace('_', ' ', $key)); ?>', <?php echo $total; ?>],
-                <?php endforeach; ?>
-            ]);
-
-            var optionsPie = {
-                title: 'Phần trăm doanh thu của các danh mục',
-                animationEnabled: true,
-                startAngle: 240,
-                yValueFormatString: "##0.00\"%\"",
-                indexLabel: "{label} {y}"
-            };
-
-            var optionsColumn = {
-                title: 'Tổng tiền các mặt hàng',
-                legend: { position: 'none' },
-                width: 300,
-                height: 300
-            };
-
-            var chartPie = new google.visualization.PieChart(document.getElementById('pie_chart'));
-            var chartColumn = new google.visualization.ColumnChart(document.getElementById('column_chart'));
-
-            chartPie.draw(dataPie, optionsPie);
-            chartColumn.draw(dataColumn, optionsColumn);
-        }
-
-    </script>
- -->
 
     <style>
         *{
             padding: 0;
             margin: 0;
             box-sizing: border-box
+        }
+        .user {
+            position: relative;
+            width: 50px;
+            height: 50px;
+        }
+
+        .user img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            object-fit: cover
+        }
+
+        .topbar {
+            position: fixed;
+            background: #fff;
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.08);
+            width: 100%;
+            height: 60px;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 2fr 10fr 0.4fr 1fr;
+            align-items: center;
+            z-index: 1;
+        }
+
+        .search {
+            position: relative;
+            width: 60%;
+            justify-self: center;
+        }
+
+        .search input{
+            width: 100%;
+            height: 40px;
+            padding: 0 40px;
+            font-size: 16px;
+            outline: none;
+            border: none;
+            border-radius: 10px;
+            background: #f5f5f5;
+        }
+
+        .search i {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            cursor: pointer;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 60px;
+            width: 260px;
+            height: calc(100% - 60px);
+            background: #299B63;
+            overflow-x: hidden;
+        }
+
+        .sidebar ul {
+            margin-top: 20px;
+        }
+
+        .sidebar ul li {
+            width: 100%;
+            list-style: none;
+        }
+
+        .sidebar ul li a {
+            width: 100%;
+            text-decoration: none;
+            color: #fff;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: #267f56; /* Darker green for hover */
+        }
+
+        .sidebar ul li a i {
+            min-width: 60px;
+            font-size: 24px;
+            text-align: center;
+        }
+
+        .sidebar ul li a.active {
+            background-color: #267f56; /* Active background color: red */
+            color: #fff; /* Ensure text color remains white */
+        }   
+
+        .main {
+            position: absolute;
+            top: 60px;
+            width: calc(100% - 260px);
+            left: 260px;
+            min-height: calc(100vh - 60px);
+            background: #f5f5f5;
+        }
+
+        .cards {
+            width: 100%;
+            padding: 35px 20px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-gap: 20px;
+        }
+
+        .cards .card {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 7px 25px 0 rgba(0,0,0,0.08)
+        }
+
+        .number {
+            font-size: 35px;
+            font-weight: 500;
+            color: #299B63;
+        }
+
+        .card-name {
+            color: #888;
+            font-weight: 600;
+        }
+
+        .icon-box i {
+            font-size: 45px;
+            color: #299B63;
+        }
+
+        .charts {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            grid-gap: 20px;
+            width: 100%;
+            padding: 20px;
+            padding-top: 0;
+        }
+
+        .chart {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 7 25px rgba(0,0,0,0.08);
+            width: 100%;
+        }
+
+        .chart h2 {
+            margin-bottom: 5px;
+            font-size: 20px;
+            color: #666;
+            text-align: center;
+        }
+
+        .test{
+            padding: 20px;
+        }
+
+        .topbar a {
+            text-align: center;
+            padding: 10px;
+            background-color: #299b63;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .topbar a:hover {
+            background-color: #267f56;
         }
     </style>
 </head>
@@ -206,42 +331,51 @@ foreach ($totalAmounts as $key => $total) {
             <div class="user">
                 <img src="https://static.vecteezy.com/system/resources/previews/021/548/095/non_2x/default-profile-picture-avatar-user-avatar-icon-person-icon-head-icon-profile-picture-icons-default-anonymous-user-male-and-female-businessman-photo-placeholder-social-network-avatar-portrait-free-vector.jpg" alt="">
             </div>
-            <button>Xuất PDF</button>
+            <a href="pdf.php" target="_blank">Xuất PDF</a>
         </div>
+        
+
         <div class="sidebar">
-            <ul class="nav nav-tabs">
-            <li class="nav-item">
-                    <a class="nav-link" href="index.php">
-                    <i class="fa-solid fa-chart-line"></i>    
-                    Thống kê</a>
+            <ul>
+                <li>
+                    <a href="index.php" class="<?php echo ($current_page == 'index.php') ? 'active' : ''; ?>">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <div>Thống kê</div>
+                    </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="category/index.php">
-                    <i class="fa-solid fa-bars-progress"></i>    
-                    Quản lý danh mục</a>
+                <li>
+                    <a href="category/index.php" class="<?php echo ($current_page == 'category/index.php') ? 'active' : ''; ?>">
+                        <i class="fa-solid fa-bars-progress"></i>
+                        <div>Quản lý danh mục</div>
+                    </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="product/">
-                    <i class="fa-solid fa-mug-saucer"></i>    
-                    Quản lý sản phẩm</a>
+                <li>
+                    <a href="product/index.php" class="<?php echo ($current_page == 'product/index.php') ? 'active' : ''; ?>">
+                        <i class="fa-solid fa-mug-saucer"></i>
+                        <div>Quản lý sản phẩm</div>
+                    </a>
                 </li>
-                <li class="nav-item ">
-                    <a class="nav-link " href="dashboard.php">
-                    <i class="fa-solid fa-cart-shopping"></i>    
-                    Quản lý đơn hàng</a>
+                <li>
+                    <a href="dashboard.php" class="<?php echo ($current_page == 'dashboard.php') ? 'active' : ''; ?>">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <div>Quản lý đơn hàng</div>
+                    </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="customer.php">
-                    <i class="fa-solid fa-person"></i>    
-                    Quản lý khách hàng</a>
+                <li>
+                    <a href="customer.php" class="<?php echo ($current_page == 'customer.php') ? 'active' : ''; ?>">
+                        <i class="fa-solid fa-person"></i>
+                        <div>Quản lý khách hàng</div>
+                    </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="revenue.php">
-                    <i class="fa-solid fa-chart-simple"></i>
-                    Biểu đồ</a>
+                <li>
+                    <a href="revenue.php" class="<?php echo ($current_page == 'revenue.php') ? 'active' : ''; ?>">
+                        <i class="fa-solid fa-chart-simple"></i>
+                        <div>Biểu đồ</div>
+                    </a>
                 </li>
             </ul>
         </div>
+
         <div class="main">
             <div class="cards">
                 <div class="card">
@@ -334,64 +468,10 @@ foreach ($totalAmounts as $key => $total) {
                     <h4 class="test"></h4>
                 </div>
             </div>
-            <div class="panel-body">
-    <table class="table table-bordered table-hover">
-        <thead>
-            <tr>
-                <td>STT</td>
-                <td>Sản phẩm</td>
-                <td>Số lượng</td>
-                <td>Giá dự kiến</td>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-            $sql="SELECT order_details.num, product.title FROM order_details JOIN product ON order_details.product_id = product.id WHERE order_details.num > 1;";
-            $productList = executeResult($sql);
-            $index = 1;
-
-            if (!empty($productList)) {
-                foreach ($productList as $product) {
-                    echo '<tr>
-                        <td>' . ($index++) . '</td>
-                        <td>' . $product['title'] . '</td>
-                        <td>' . $product['num'] . '</td>
-                        <td>Giá dự kiến</td> <!-- Bạn cần thay thế phần này bằng giá dự kiến thực tế -->
-                    </tr>';
-                }
-            } else {
-                echo '<tr><td colspan="4" class="text-center">Không có sản phẩm nào</td></tr>';
-            }
-            ?>
-        </tbody>
-    </table>
-</div>
-
-                </table>
-            </div>
         </div>
     </div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-    var navLinks = document.querySelectorAll('.nav-link');
-
-    navLinks.forEach(function(link) {
-      link.addEventListener('mouseover', function() {
-        navLinks.forEach(function(otherLink) {
-          if (otherLink !== link) {
-            otherLink.classList.add('hovered');
-          }
-        });
-      });
-
-      link.addEventListener('mouseout', function() {
-        navLinks.forEach(function(otherLink) {
-          otherLink.classList.remove('hovered');
-        });
-      });
-    });
-  });
     // Hàm để lấy dữ liệu doanh thu hàng tháng qua AJAX
     function fetchMonthlyRevenue() {
         // Thực hiện một yêu cầu AJAX đến script PHP
